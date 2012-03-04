@@ -1,6 +1,7 @@
 from django.conf import settings
 
-
+LESS_STATIC_ROOT = getattr(settings, "LESS_STATIC_ROOT", "")
+LESS_STATIC_URL = getattr(settings, "LESS_STATIC_URL", "/static/")
 LESS_EXECUTABLE = getattr(settings, "LESS_EXECUTABLE", "lessc")
 LESS_USE_CACHE = getattr(settings, "LESS_USE_CACHE", True)
 LESS_CACHE_TIMEOUT = getattr(settings, "LESS_CACHE_TIMEOUT", 60 * 60 * 24 * 30) # 30 days

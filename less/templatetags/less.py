@@ -1,9 +1,8 @@
 from tempfile import NamedTemporaryFile
 from ..cache import get_cache_key, get_hexdigest, get_hashed_mtime
 from ..settings import LESS_EXECUTABLE, LESS_USE_CACHE,\
-    LESS_CACHE_TIMEOUT, LESS_OUTPUT_DIR
+    LESS_CACHE_TIMEOUT, LESS_OUTPUT_DIR, LESS_STATIC_ROOT, LESS_STATIC_URL
 from ..utils import URLConverter
-from django.conf import settings
 from django.core.cache import cache
 from django.template.base import Library, Node
 import logging
@@ -64,25 +63,14 @@ def do_inlineless(parser, token):
 
 @register.simple_tag
 def less(path):
-
-    try:
-        STATIC_ROOT = settings.STATIC_ROOT
-    except AttributeError:
-        STATIC_ROOT = settings.MEDIA_ROOT
-
-    try:
-        STATIC_URL = settings.STATIC_URL
-    except AttributeError:
-        STATIC_URL = settings.MEDIA_URL
-
-    encoded_full_path = full_path = os.path.join(STATIC_ROOT, path)
+    encoded_full_path = full_path = os.path.join(LESS_STATIC_ROOT, path)
     if isinstance(full_path, unicode):
         filesystem_encoding = sys.getfilesystemencoding() or sys.getdefaultencoding()
         encoded_full_path = full_path.encode(filesystem_encoding)
 
     filename = os.path.split(path)[-1]
 
-    output_directory = os.path.join(STATIC_ROOT, LESS_OUTPUT_DIR, os.path.dirname(path))
+    output_directory = os.path.join(LESS_STATIC_ROOT, LESS_OUTPUT_DIR, os.path.dirname(path))
 
     hashed_mtime = get_hashed_mtime(full_path)
 
@@ -102,7 +90,7 @@ def less(path):
             if not os.path.exists(output_directory):
                 os.makedirs(output_directory)
             compiled_file = open(output_path, "w+")
-            compiled_file.write(URLConverter(out, os.path.join(STATIC_URL, path)).convert())
+            compiled_file.write(URLConverter(out, os.path.join(LESS_STATIC_URL, path)).convert())
             compiled_file.close()
 
             # Remove old files
@@ -114,4 +102,4 @@ def less(path):
             logger.error(errors)
             return path
 
-    return output_path[len(STATIC_ROOT):].replace(os.sep, '/').lstrip("/")
+    return output_path[len(LESS_STATIC_ROOT):].replace(os.sep, '/').lstrip("/")
