@@ -3,6 +3,7 @@ Django LESS
 
 Django LESS provides template tags to compile LESS into CSS from templates.
 It works with both inline code and extenal files.
+This is a fork from https://github.com/andreyfedoseev/django-less with a few fixes.
 
 Installation
 ************
